@@ -50,21 +50,36 @@ st.markdown(f"""
     .stApp {{ background-color: {bg_color}; transition: background 0.5s ease; color: white; }}
     .ultra-title {{ text-align: center; font-size: 40px !important; font-weight: 900; text-shadow: 0 0 20px white; margin-bottom: 20px; }}
     
-    /* KNÖPFE NORMAL GROSS - SCHRIFT EXTREM GROSS */
-    .stButton>button {{
-        background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
-        border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 15px;
-        color: white; 
-        height: 90px !important;    /* Normale Knopf-Höhe wie davor */
-        font-size: 35px !important;  /* Schrift trotzdem extrem groß */
+    /* KNÖPFE NORMAL - NAMEN DARIN MAXIMAL GROSS */
+    div.stButton > button {{
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 15px !important;
+        color: white !important;
+        height: 120px !important;    /* Etwas höher für die riesige Schrift */
+        width: 100% !important;
+    }}
+
+    /* HIER WIRD DER TEXT IM KNOPF ENORM GROSS */
+    div.stButton > button p {{
+        font-size: 50px !important;  /* RIESIGE SCHRIFT */
         font-weight: 900 !important;
-        white-space: nowrap;
+        line-height: 1.2 !important;
     }}
     
     @keyframes blink {{ 0% {{ opacity: 1; }} 50% {{ opacity: 0.3; }} 100% {{ opacity: 1; }} }}
-    .alarm-text {{ color: yellow; font-weight: bold; text-align: center; font-size: 30px; animation: blink 1s infinite; border: 3px dashed yellow; border-radius: 10px; padding: 10px; }}
-    div[data-testid="stButton"] button:contains("🚽") {{ background: white !important; color: black !important; border: 4px solid gold !important; }}
-    .copyright {{ text-align: center; font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 50px; }}
+    .alarm-text {{ color: yellow; font-weight: bold; text-align: center; font-size: 35px; animation: blink 1s infinite; border: 3px dashed yellow; border-radius: 10px; padding: 10px; }}
+    
+    /* Besetzter Knopf (weiß mit goldener Umrandung) */
+    div[data-testid="stButton"] button:has(span:contains("🚽")) {{ 
+        background-color: white !important; 
+    }}
+    div[data-testid="stButton"] button:has(span:contains("🚽")) p {{
+        color: black !important;
+    }}
+
+    .copyright {{ text-align: center; font-size: 14px; color: rgba(255,255,255,0.4); margin-top: 50px; }}
     header {{visibility: hidden;}} footer {{visibility: hidden;}}
     </style>
     """, unsafe_allow_html=True)
@@ -79,18 +94,19 @@ if wer_ist_weg:
     m, s = divmod(sekunden_weg, 60)
     with c3: st.metric("⏳ ZEIT WEG", f"{m:02d}:{s:02d}")
     if ist_alarm:
-        st.markdown(f'<div class="alarm-text">⚠️ ALARM: {wer_ist_weg} IST ÜBERFÄLLIG! ⚠️</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="alarm-text">⚠️ ALARM: {wer_ist_weg} ÜBERFÄLLIG! ⚠️</div>', unsafe_allow_html=True)
 
 st.write("---")
 
-# --- GRID (Wieder 3 Spalten nebeneinander) ---
+# --- GRID (3 Spalten) ---
 cols = st.columns(3)
 namen_sortiert = sorted(SCHUELER_INFO.keys())
 for i, name in enumerate(namen_sortiert):
     with cols[i % 3]:
         ist_dieser_weg = (wer_ist_weg == name)
-        info = SCHUELER_INFO[name]
+        # Label ohne Emojis für maximale Textgröße, außer wenn weg
         label = f"🚽 {name}" if ist_dieser_weg else f"{name}"
+        
         if st.button(label, key=f"btn_{name}", use_container_width=True, disabled=(wer_ist_weg is not None and not ist_dieser_weg)):
             jetzt = datetime.now()
             if not ist_dieser_weg:
@@ -116,8 +132,6 @@ with st.expander("🛠️ ADMIN TERMINAL"):
         if st.button("🗑️ CLEAR MEMORY"):
             db["df"] = pd.DataFrame(columns=["Datum", "Name", "Von", "Bis", "Dauer"])
             st.rerun()
-    elif pw_input != "":
-        st.error("Invalid Code.")
 
 st.markdown('<div class="copyright">© 2026 bolyzockt - Herr Dietsch’s krasses Terminal 9g</div>', unsafe_allow_html=True)
 
