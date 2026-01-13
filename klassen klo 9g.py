@@ -4,7 +4,7 @@ from datetime import datetime
 import time
 
 # --- CONFIG ---
-st.set_page_config(page_title="Herr Dietsch’s krasses Terminal", page_icon="🚽", layout="wide")
+st.set_page_config(page_title="Herr Dietschs krasses Terminal - 9g", page_icon="🚀", layout="wide")
 
 # --- GLOBALER SPEICHER (Server-Seitig) ---
 @st.cache_resource
@@ -16,16 +16,27 @@ db = get_permanent_log()
 if 'auf_klo' not in st.session_state:
     st.session_state.auf_klo = {}
 
-# DEINE KLASSE 2026
+# DEINE KLASSE 9g (2026 Edition)
 SCHUELER_INFO = {
-    "Ahmad": {"emoji": "⚡"}, "Rean": {"emoji": "🔥"}, "Zeynep": {"emoji": "🌸"},
-    "Nicolo": {"emoji": "🧊"}, "Hamza": {"emoji": "🐹"}, "Bilind": {"emoji": "🌋"},
-    "Luka": {"emoji": "🌊"}, "Marios": {"emoji": "💎"}, "Kaja": {"emoji": "🦦"},
-    "Gencho": {"emoji": "🚀"}, "Stjepan": {"emoji": "🍀"}, "Leandro": {"emoji": "👑"},
-    "Zuzanna": {"emoji": "🌈"}, "Matija": {"emoji": "🌙"}, "Zoltan": {"emoji": "🔮"},
+    "Ahmad": {"emoji": "⚡"}, 
+    "Rean": {"emoji": "🔥"}, 
+    "Zeynep": {"emoji": "🌸"},
+    "Nicolo": {"emoji": "🧊"}, 
+    "Hamza": {"emoji": "🐹"}, 
+    "Bilind": {"emoji": "🌋"},
+    "Luka": {"emoji": "🌊"}, 
+    "Marios": {"emoji": "💎"}, 
+    "Kaja": {"emoji": "🦦"},
+    "Gencho": {"emoji": "🚀"}, 
+    "Stjepan": {"emoji": "🍀"}, 
+    "Leandro": {"emoji": "👑"},
+    "Zuzanna": {"emoji": "🌈"}, 
+    "Matija": {"emoji": "🌙"}, 
+    "Zoltan": {"emoji": "🔮"},
     "Dominik": {"emoji": "✨"}
 }
 
+# PASSWORT & SETTINGS
 GEHEIMES_PW = "LeonKing"
 ALARM_MINUTEN = 15
 
@@ -40,7 +51,7 @@ if wer_ist_weg:
     if sekunden_weg >= ALARM_MINUTEN * 60:
         ist_alarm = True
 
-# Hintergrundfarbe (Alarm-Rot oder Besetzt-Lila)
+# Hintergrundfarbe
 bg_color = "#FF0000" if ist_alarm else ("#8A2BE2" if wer_ist_weg else "#1e1233")
 
 # --- STYLE ---
@@ -48,11 +59,18 @@ st.markdown(f"""
     <style>
     .stApp {{ background-color: {bg_color}; transition: background 0.5s ease; color: white; }}
     .ultra-title {{ text-align: center; font-size: 40px !important; font-weight: 900; text-shadow: 0 0 20px white; margin-bottom: 20px; }}
+    
+    /* GRÖSSERE NAMEN AUF DEN BUTTONS */
     .stButton>button {{
         background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
         border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 15px;
-        color: white; height: 90px; font-size: 20px !important; font-weight: bold;
+        color: white; 
+        height: 110px;        /* Button etwas höher gemacht */
+        font-size: 28px !important; /* SCHRIFT DEUTLICH GRÖSSER */
+        font-weight: 900 !important;
+        text-transform: uppercase;
     }}
+    
     @keyframes blink {{ 0% {{ opacity: 1; }} 50% {{ opacity: 0.3; }} 100% {{ opacity: 1; }} }}
     .alarm-text {{ color: yellow; font-weight: bold; text-align: center; font-size: 30px; animation: blink 1s infinite; border: 3px dashed yellow; border-radius: 10px; padding: 10px; }}
     div[data-testid="stButton"] button:contains("🚽") {{ background: white !important; color: black !important; border: 5px solid gold !important; }}
@@ -61,7 +79,7 @@ st.markdown(f"""
     </style>
     """, unsafe_allow_html=True)
 
-st.markdown('<div class="ultra-title">🚀 HERR DIETSCH’S KRASSES TERMINAL 🚀</div>', unsafe_allow_html=True)
+st.markdown('<div class="ultra-title">🚀 HERR DIETSCH’S KRASSES TERMINAL 9g 🚀</div>', unsafe_allow_html=True)
 
 # --- DASHBOARD ---
 c1, c2, c3 = st.columns(3)
@@ -71,15 +89,15 @@ if wer_ist_weg:
     m, s = divmod(sekunden_weg, 60)
     with c3: st.metric("⏳ ZEIT WEG", f"{m:02d}:{s:02d}")
     if ist_alarm:
-        st.markdown(f'<div class="alarm-text">⚠️ ALARM: {wer_ist_weg} IST SEIT {m} MINUTEN WEG! ⚠️</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="alarm-text">⚠️ ALARM: {wer_ist_weg} IST ÜBERFÄLLIG! ⚠️</div>', unsafe_allow_html=True)
 
 st.write("---")
 
 # --- GRID ---
-cols = st.columns(3)
+cols = st.columns(2) # Nur 2 Spalten für noch mehr Platz pro Name
 namen_sortiert = sorted(SCHUELER_INFO.keys())
 for i, name in enumerate(namen_sortiert):
-    with cols[i % 3]:
+    with cols[i % 2]:
         ist_dieser_weg = (wer_ist_weg == name)
         info = SCHUELER_INFO[name]
         label = f"🚽 {info['emoji']} {name}" if ist_dieser_weg else f"{info['emoji']} {name}"
@@ -99,22 +117,22 @@ for i, name in enumerate(namen_sortiert):
 # --- ADMIN TERMINAL ---
 st.write("---")
 with st.expander("🛠️ ADMIN TERMINAL"):
-    pw_input = st.text_input("Herr dietsch terminal access code", type="password")
+    pw_input = st.text_input("Identity Verification", type="password", placeholder="Access Code eingeben...")
     if pw_input == GEHEIMES_PW:
-        st.success("Daten-Kern 2026 stabil.")
+        st.success("Access Granted. 9g Core Online.")
         st.dataframe(db["df"], use_container_width=True)
         csv = db["df"].to_csv(index=False).encode('utf-8')
-        st.download_button(label="💾 PROTOKOLL DOWNLOAD", data=csv, file_name="Dietsch_Klo_Log_2026.csv", mime="text/csv")
-        if st.button("🗑️ SPEICHER LÖSCHEN"):
+        st.download_button(label="💾 DOWNLOAD LOGS", data=csv, file_name="Dietsch_Log_9g_2026.csv", mime="text/csv")
+        if st.button("🗑️ CLEAR SYSTEM MEMORY"):
             db["df"] = pd.DataFrame(columns=["Datum", "Name", "Von", "Bis", "Dauer"])
             st.rerun()
         st.markdown("---")
-        st.write("© 2026 Leon | Alle Rechte vorbehalten | System: LeonKing OS v501")
+        st.write("© 2026 bolyzockt | System: bolyzockt OS v501")
+    elif pw_input != "":
+        st.error("Invalid Code. Access Denied.")
 
-# Footer Copyright
-st.markdown('<div class="copyright">© 2026 Leon - Herr Dietsch’s krasses Terminal</div>', unsafe_allow_html=True)
+st.markdown('<div class="copyright">© 2026 bolyzockt - Herr Dietsch’s krasses Terminal 9g</div>', unsafe_allow_html=True)
 
 if wer_ist_weg:
     time.sleep(2)
-
     st.rerun()
