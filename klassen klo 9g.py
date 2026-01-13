@@ -18,7 +18,7 @@ if 'auf_klo' not in st.session_state:
 # DEINE KLASSE 9g
 SCHUELER_INFO = {
     "Ahmad": "⚡", "Rean": "🔥", "Zeynep": "🌸", "Nicolo": "🧊", 
-    "Hamza": "🐹", "Bilind": " volcano", "Luka": "🌊", "Marios": "💎", 
+    "Hamza": "🐹", "Bilind": "🌋", "Luka": "🌊", "Marios": "💎", 
     "Kaja": "🦦", "Gencho": "🚀", "Stjepan": "🍀", "Leandro": "👑",
     "Zuzanna": "🌈", "Matija": "🌙", "Zoltan": "🔮", "Dominik": "✨"
 }
@@ -124,3 +124,4 @@ with st.expander("🛠️ ADMIN"):
 if wer_ist_weg:
     time.sleep(2)
     st.rerun()
+
