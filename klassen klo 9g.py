@@ -99,7 +99,7 @@ for i, name in enumerate(namen_sortiert):
 # --- ADMIN TERMINAL ---
 st.write("---")
 with st.expander("🛠️ ADMIN TERMINAL"):
-    pw_input = st.text_input("LeonKing Access Code", type="password")
+    pw_input = st.text_input("Herr dietsch terminal access code", type="password")
     if pw_input == GEHEIMES_PW:
         st.success("Daten-Kern 2026 stabil.")
         st.dataframe(db["df"], use_container_width=True)
@@ -116,4 +116,5 @@ st.markdown('<div class="copyright">© 2026 Leon - Herr Dietsch’s krasses Term
 
 if wer_ist_weg:
     time.sleep(2)
+
     st.rerun()
