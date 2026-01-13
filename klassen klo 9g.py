@@ -16,7 +16,7 @@ db = get_permanent_log()
 if 'auf_klo' not in st.session_state:
     st.session_state.auf_klo = {}
 
-# DEINE KLASSE 9g (2026 Edition)
+# DEINE KLASSE 9g
 SCHUELER_INFO = {
     "Ahmad": {"emoji": "⚡"}, "Rean": {"emoji": "🔥"}, "Zeynep": {"emoji": "🌸"},
     "Nicolo": {"emoji": "🧊"}, "Hamza": {"emoji": "🐹"}, "Bilind": {"emoji": "🌋"},
@@ -48,24 +48,23 @@ bg_color = "#FF0000" if ist_alarm else ("#8A2BE2" if wer_ist_weg else "#1e1233")
 st.markdown(f"""
     <style>
     .stApp {{ background-color: {bg_color}; transition: background 0.5s ease; color: white; }}
-    .ultra-title {{ text-align: center; font-size: 50px !important; font-weight: 900; text-shadow: 0 0 20px white; margin-bottom: 20px; }}
+    .ultra-title {{ text-align: center; font-size: 40px !important; font-weight: 900; text-shadow: 0 0 20px white; margin-bottom: 20px; }}
     
-    /* EXTREM GROSSE NAMEN */
+    /* KNÖPFE NORMAL GROSS - SCHRIFT EXTREM GROSS */
     .stButton>button {{
         background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
-        border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 15px;
         color: white; 
-        height: 150px !important;    /* Buttons noch höher */
-        font-size: 45px !important;  /* SCHRIFT EXTREM GROSS */
+        height: 90px !important;    /* Normale Knopf-Höhe wie davor */
+        font-size: 35px !important;  /* Schrift trotzdem extrem groß */
         font-weight: 900 !important;
-        text-transform: uppercase;
-        margin-bottom: 10px;
+        white-space: nowrap;
     }}
     
     @keyframes blink {{ 0% {{ opacity: 1; }} 50% {{ opacity: 0.3; }} 100% {{ opacity: 1; }} }}
-    .alarm-text {{ color: yellow; font-weight: bold; text-align: center; font-size: 35px; animation: blink 1s infinite; border: 3px dashed yellow; border-radius: 10px; padding: 10px; }}
-    div[data-testid="stButton"] button:contains("🚽") {{ background: white !important; color: black !important; border: 6px solid gold !important; }}
-    .copyright {{ text-align: center; font-size: 14px; color: rgba(255,255,255,0.3); margin-top: 50px; }}
+    .alarm-text {{ color: yellow; font-weight: bold; text-align: center; font-size: 30px; animation: blink 1s infinite; border: 3px dashed yellow; border-radius: 10px; padding: 10px; }}
+    div[data-testid="stButton"] button:contains("🚽") {{ background: white !important; color: black !important; border: 4px solid gold !important; }}
+    .copyright {{ text-align: center; font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 50px; }}
     header {{visibility: hidden;}} footer {{visibility: hidden;}}
     </style>
     """, unsafe_allow_html=True)
@@ -80,31 +79,32 @@ if wer_ist_weg:
     m, s = divmod(sekunden_weg, 60)
     with c3: st.metric("⏳ ZEIT WEG", f"{m:02d}:{s:02d}")
     if ist_alarm:
-        st.markdown(f'<div class="alarm-text">⚠️ ALARM: {wer_ist_weg} ÜBERFÄLLIG! ⚠️</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="alarm-text">⚠️ ALARM: {wer_ist_weg} IST ÜBERFÄLLIG! ⚠️</div>', unsafe_allow_html=True)
 
 st.write("---")
 
-# --- GRID (1 Spalte für maximale Schriftbreite) ---
+# --- GRID (Wieder 3 Spalten nebeneinander) ---
+cols = st.columns(3)
 namen_sortiert = sorted(SCHUELER_INFO.keys())
-for name in namen_sortiert:
-    ist_dieser_weg = (wer_ist_weg == name)
-    info = SCHUELER_INFO[name]
-    label = f"🚽 {info['emoji']} {name}" if ist_dieser_weg else f"{info['emoji']} {name}"
-    
-    if st.button(label, key=f"btn_{name}", use_container_width=True, disabled=(wer_ist_weg is not None and not ist_dieser_weg)):
-        jetzt = datetime.now()
-        if not ist_dieser_weg:
-            st.session_state.auf_klo[name] = jetzt
-            st.rerun()
-        else:
-            start_zeit = st.session_state.auf_klo.pop(name)
-            diff = jetzt - start_zeit
-            m, s = divmod(int(diff.total_seconds()), 60)
-            neue_daten = pd.DataFrame([{"Datum": jetzt.strftime("%d.%m.%Y"), "Name": name, "Von": start_zeit.strftime("%H:%M:%S"), "Bis": jetzt.strftime("%H:%M:%S"), "Dauer": f"{m}m {s}s"}])
-            db["df"] = pd.concat([db["df"], neue_daten], ignore_index=True)
-            st.rerun()
+for i, name in enumerate(namen_sortiert):
+    with cols[i % 3]:
+        ist_dieser_weg = (wer_ist_weg == name)
+        info = SCHUELER_INFO[name]
+        label = f"🚽 {name}" if ist_dieser_weg else f"{name}"
+        if st.button(label, key=f"btn_{name}", use_container_width=True, disabled=(wer_ist_weg is not None and not ist_dieser_weg)):
+            jetzt = datetime.now()
+            if not ist_dieser_weg:
+                st.session_state.auf_klo[name] = jetzt
+                st.rerun()
+            else:
+                start_zeit = st.session_state.auf_klo.pop(name)
+                diff = jetzt - start_zeit
+                m, s = divmod(int(diff.total_seconds()), 60)
+                neue_daten = pd.DataFrame([{"Datum": jetzt.strftime("%d.%m.%Y"), "Name": name, "Von": start_zeit.strftime("%H:%M:%S"), "Bis": jetzt.strftime("%H:%M:%S"), "Dauer": f"{m}m {s}s"}])
+                db["df"] = pd.concat([db["df"], neue_daten], ignore_index=True)
+                st.rerun()
 
-# --- ADMIN TERMINAL ---
+# --- ADMIN ---
 st.write("---")
 with st.expander("🛠️ ADMIN TERMINAL"):
     pw_input = st.text_input("Identity Verification", type="password", placeholder="Access Code...")
@@ -116,7 +116,6 @@ with st.expander("🛠️ ADMIN TERMINAL"):
         if st.button("🗑️ CLEAR MEMORY"):
             db["df"] = pd.DataFrame(columns=["Datum", "Name", "Von", "Bis", "Dauer"])
             st.rerun()
-        st.write("© 2026 bolyzockt")
     elif pw_input != "":
         st.error("Invalid Code.")
 
