@@ -77,7 +77,7 @@ st.markdown(f"""
     </style>
     """, unsafe_allow_html=True)
 
-st.markdown('<div class="ultra-title">🚀 HERR DIETSCH’S KRASSES TERMINAL 9g 🚀</div>', unsafe_allow_html=True)
+st.markdown('<div class="ultra-title">🚀 HERR DIETSCHS KRASSES TERMINAL 9g 🚀</div>', unsafe_allow_html=True)
 
 # DASHBOARD
 c1, c2, c3 = st.columns(3)
@@ -124,5 +124,6 @@ with st.expander("🛠️ ADMIN"):
 if wer_ist_weg:
     time.sleep(2)
     st.rerun()
+
 
 
